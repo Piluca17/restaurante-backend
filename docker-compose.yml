@@ -1,16 +1,21 @@
 # Use root/example as user/password credentials
-version: '3.1'
+version: "3.1"
 
+# En este docker compose hay varios servicios que se ejecutan; y, éstos son: base de datos, phpmyadmin y node-app
 services:
   db:
     image: mysql:8
     restart: always
+
+    # En enviroment hay unas variables de entorno
     environment:
       LANG: C.UTF-8
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+   
+    # Docker-entrypoint-initDb si encuentra algún fichero, lo ejecuta en la base de datos
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./data/initData:/docker-entrypoint-initdb.d
@@ -19,16 +24,17 @@ services:
     image: phpmyadmin
     restart: always
     ports:
-      - 8080:80
-    environment:
-      - PMA_HOST=db
-
+      - 9090:80
+    # environment:
+      # - PMA_HOST=db
+      
+# Node-app, es una aplicación hecha en node
   node-app:
     build:
       context: ./app
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - "4000:3000"
     depends_on:
       - db
     environment:
